@@ -7,4 +7,8 @@ Podpunkt a dotyczy problemu otoczki wypukłej (convex hull). Program najpierw zn
 - deklaruje top i next: punkt top jest równy pierwszemu punktowi na stosie, a next — drugiemu. 
 - przechodzi pętlą for przez listę, gdzie pętla loop sprawdza punkty na stosie: jeżeli skręt punktów next, top i punktu z indeksem i jest prawoskrętny lub prosty to znaczy, że top nie jest częścią otoczki, więc go usuwamy, a jeżeli jest lewoskrętny to pozostawiamy go. Po przejsciu pętli while dodajemy punkt z indeksem i na stos.
 
-Program bierze pod uwagę, że jeżeli zostały podane 3 lub mniej punktów, to te punkty są tą otoczką.
+Program bierze pod uwagę, że jeżeli zostały podane 3 lub mniej punktów, to te punkty są tą otoczką. W przypadku, kiedy mamy 3 punkty, to są one sortowane.
+
+## b
+
+Po wyznaczeniu otoczki wypukłej drugi podpunkt staje się o wiele łatwiejszy, ponieważ wystarczy z podanych uporządkowanych punktów wyznaczyć proste wzdłuż krawędzi otoczki, a następnie sprawdzić który inny punkt jest oddalony najbardziej od tej prostej. Ta odległość to odległość dwóch prostych równoległych od siebie. Sprawdzamy, która z wyznaczonych odległości jest najmniejsza. Jeżeli mamy mniej niż 3 punkty toodległość ta wynosi 0.
