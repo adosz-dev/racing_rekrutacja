@@ -12,3 +12,8 @@ Program bierze pod uwagę, że jeżeli zostały podane 3 lub mniej punktów, to 
 ## b
 
 Po wyznaczeniu otoczki wypukłej drugi podpunkt staje się o wiele łatwiejszy, ponieważ wystarczy z podanych uporządkowanych punktów wyznaczyć proste wzdłuż krawędzi otoczki, a następnie sprawdzić który inny punkt jest oddalony najbardziej od tej prostej. Ta odległość to odległość dwóch prostych równoległych od siebie. Sprawdzamy, która z wyznaczonych odległości jest najmniejsza. Jeżeli mamy mniej niż 3 punkty toodległość ta wynosi 0.
+
+## c
+
+Do rozwiązania trzeciego podpunktu użyłem algorytmu typu *divide and conquer* w formie rekurencyjnej. Sortuję listę względem x. W funkcji closest_pair wyzwalam funckję brute_force, jeżeli długość przedziełu <= 3 i zwracam odpowiedź. W innych przypadkach dzielę zbiór na pół. 
+Aby wziąć pod uwagę punkty, które mogą się znajdować przy granicy przedziału tworzę "pas" o szerokości 2d po równo po obu stronach środka dzielącego wcześniejsze przedziały. Sortuje punkty z tego "pasa" według y i szukam odległości najmniejszej.
