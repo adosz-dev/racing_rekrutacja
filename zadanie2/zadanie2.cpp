@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cfloat>
 #include <cmath>
 #include <algorithm>
 #include <fstream>
@@ -114,6 +115,69 @@ float minimum_distance_lines(vector<pair<float, float>> hull){
   return lowest_distance;
 }
 
+// odległość między punktami podniesiona do kwadratu
+float point_distance_sq(pair<float, float> p1, pair<float, float> p2){
+  return pow(p1.first-p2.first, 2) + pow(p1.second - p2.second, 2);
+}
+
+// porównywanie x i y do funkcji sort
+bool compare_x(pair<float, float> p1, pair<float, float> p2){
+  return p1.first < p2.first;
+}
+
+bool compare_y(pair<float, float> p1, pair<float,float> p2){
+  return p1.second < p2.second;
+}
+
+float brute_force(vector<pair<float, float>>& points, int left, int right){
+  float min_d_sq = FLT_MAX;
+  for (int i=left; i < right; i++){
+    for (int j=i+1; j<= right; j++){
+      float d_sq = point_distance_sq(points[i], points[j]);
+      if (d_sq < min_d_sq){
+        min_d_sq = d_sq;
+      }
+    }
+  }
+  return sqrt(min_d_sq);
+}
+
+float closest_pair(vector<pair<float, float>>& points, int left, int right){
+  int n = right - left + 1;
+  if (n <= 3){
+    return brute_force(points, left, right);
+  }
+  int mid = left + n/2;
+  float dl = closest_pair(points, left, mid);
+  float dr = closest_pair(points, mid+1, right);
+  float d = min(dl, dr);
+  
+  // budowanie pasa o szerokości 2d
+  vector<pair<float, float>> strip;
+  for(int i=left; i<= right; i++){
+    if (abs(points[i].first - points[mid].first) < d){
+      strip.push_back(points[i]);
+    }
+  }
+  // sortowanie według y 
+  sort(strip.begin(), strip.end(), compare_y);
+  float d_strip = d;
+  for (size_t i=0; i < strip.size(); i++){
+    for (size_t j=i+1; j < strip.size(); j++){
+      if ((strip[j].second - strip[i].second) >= d_strip){
+        break;
+      }
+      d_strip = min(d_strip, point_distance_sq(strip[i], strip[j]));
+    }
+  }
+  return min(d, d_strip);
+}
+
+float closest_pair_wrapper(vector<pair<float, float>>& points){
+  sort(points.begin(), points.end(), compare_x);
+  return closest_pair(points, 0, points.size()-1);
+}
+
 int main (int argc, char *argv[]) {
   ifstream input_file("input.txt");
   if (!input_file){
@@ -138,7 +202,16 @@ int main (int argc, char *argv[]) {
     cout << hull[i].first << "\t" << hull[i].second << endl;
   }
   // odległość między prostymi
-  cout << "Proste: d=" << minimum_distance_lines(hull);
+  cout << "Proste: d=" << minimum_distance_lines(hull) << endl;
+
+  // najbliższe punkty
+  cout << "Najbliższe punkty: ";
+  if (n <= 1){
+    cout << "nie istnieje żadna para punktów" << endl;
+  }
+  else {
+    cout << closest_pair_wrapper(points) << endl;
+  }
   
   return 0;
 }
