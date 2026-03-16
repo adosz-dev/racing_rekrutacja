@@ -115,6 +115,13 @@ float minimum_distance_lines(vector<pair<float, float>> hull){
   return lowest_distance;
 }
 
+// struktura z rozwiązaniem do 3
+struct result {
+  pair<float, float> p1;
+  pair<float, float> p2;
+  float distance;
+};
+
 // odległość między punktami podniesiona do kwadratu
 float point_distance_sq(pair<float, float> p1, pair<float, float> p2){
   return pow(p1.first-p2.first, 2) + pow(p1.second - p2.second, 2);
@@ -129,39 +136,42 @@ bool compare_y(pair<float, float> p1, pair<float,float> p2){
   return p1.second < p2.second;
 }
 
-float brute_force(vector<pair<float, float>>& points, int left, int right){
+result brute_force(vector<pair<float, float>>& points, int left, int right){
+  result res;
   float min_d_sq = FLT_MAX;
   for (int i=left; i < right; i++){
     for (int j=i+1; j<= right; j++){
       float d_sq = point_distance_sq(points[i], points[j]);
       if (d_sq < min_d_sq){
         min_d_sq = d_sq;
+        res = {points[i], points[j], d_sq};
       }
     }
   }
-  return sqrt(min_d_sq);
+  res.distance = sqrt(res.distance);
+  return res;
 }
 
-float closest_pair(vector<pair<float, float>>& points, int left, int right){
+result closest_pair(vector<pair<float, float>>& points, int left, int right){
   int n = right - left + 1;
   if (n <= 3){
     return brute_force(points, left, right);
   }
   int mid = left + n/2;
-  float dl = closest_pair(points, left, mid);
-  float dr = closest_pair(points, mid+1, right);
-  float d = min(dl, dr);
+  result resl = closest_pair(points, left, mid);
+  result resr = closest_pair(points, mid+1, right);
+  result res = (resl.distance < resr.distance) ? resl : resr;
   
   // budowanie pasa o szerokości 2d
   vector<pair<float, float>> strip;
   for(int i=left; i<= right; i++){
-    if (abs(points[i].first - points[mid].first) < d){
+    if (abs(points[i].first - points[mid].first) < res.distance){
       strip.push_back(points[i]);
     }
   }
   // sortowanie według y 
   sort(strip.begin(), strip.end(), compare_y);
-  float d_strip = d;
+  float d_strip = res.distance;
   for (size_t i=0; i < strip.size(); i++){
     for (size_t j=i+1; j < strip.size(); j++){
       if ((strip[j].second - strip[i].second) >= d_strip){
@@ -170,10 +180,11 @@ float closest_pair(vector<pair<float, float>>& points, int left, int right){
       d_strip = min(d_strip, point_distance_sq(strip[i], strip[j]));
     }
   }
-  return min(d, d_strip);
+  res.distance = min(res.distance, d_strip);
+  return res;
 }
 
-float closest_pair_wrapper(vector<pair<float, float>>& points){
+result closest_pair_wrapper(vector<pair<float, float>>& points){
   sort(points.begin(), points.end(), compare_x);
   return closest_pair(points, 0, points.size()-1);
 }
@@ -210,7 +221,10 @@ int main (int argc, char *argv[]) {
     cout << "nie istnieje żadna para punktów" << endl;
   }
   else {
-    cout << closest_pair_wrapper(points) << endl;
+    result res = closest_pair_wrapper(points);
+    cout << "("<< res.p1.first << ", " << res.p1.second << ")";
+    cout << ", ("<< res.p2.first << ", " << res.p2.second << ")\t";
+    cout << res.distance;
   }
   
   return 0;
